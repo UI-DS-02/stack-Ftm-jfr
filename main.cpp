@@ -71,6 +71,31 @@ public:
         return false;
     }
 };
+bool rating(char current, char top) {
+    map<char, int> precedence = {{'-', 1}, {'+', 1}, {'/', 2}, {'*', 2}, {'!', 3}, {'^',3}};
+    int c1 = precedence[current];
+    int c2 = precedence[top];
+    if (c1 < c2)
+        return false;
+    return true;
+}
+
+
+bool isopperan(char c) {
+    set<char> a = {'+', '-', '*','^', '!', '/'};
+    if (a.find(c) != a.end())
+        return true;
+    return false;
+}
+
+int factorial(int num){
+    int ans=1;
+    for(int i=2;i<=num;i++){
+        ans*=i;
+    }
+    return ans;
+}
+
 stack converttopostfix(vector<char> expresion){
     stack s;
     stack postfix;
