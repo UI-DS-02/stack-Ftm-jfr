@@ -71,7 +71,100 @@ public:
         return false;
     }
 };
+stack converttopostfix(vector<char> expresion){
+    stack s;
+    stack postfix;
+    stack postfixx;
+    int pcounter[2]={0,0};
+    for(int i=0;i<expresion.size();i++){
+        float current = expresion[i];
 
+        if(current == '(')
+        {
+            pcounter[0]++;
+            s.push('(') ;
+        }
+        else if(current == ')')
+        {
+            pcounter[1]++;
+            while (s.top()!='('&&!s.isEmpty()){
+                postfix.push(s.pop());
+            }
+            if(s.isEmpty())
+            {
+                errorhandeling();
+                return postfixx;
+            }
+            s.pop();
+        }
+        else if(current=='-' && isdigit(expresion[i+1]))
+        {
+            string f="-";
+            f=current;
+            i++;
+            while(isdigit(expresion[i])||expresion[i]=='.')
+            {
+
+                f+=expresion[i];
+                i++;
+            }
+            i--;
+            if(f.length()>1) {
+                float tem = stof(f);
+                postfix.push(tem);
+            }
+            else{
+                postfix.push((current)-48*(-1));
+            }
+        }
+        else if(isopperan(current))
+        {
+            if(rating(current,s.top())){
+                s.push(current);
+            } else{
+                while(!s.isEmpty() && !rating(current,s.top())){
+                    postfix.push(s.pop());
+                }
+                s.push(current);
+            }
+        }
+        else
+        {
+            string f;
+            f=current;
+            i++;
+            while(isdigit(expresion[i])||expresion[i]=='.')
+            {
+
+                f+=expresion[i];
+                i++;
+            }
+            i--;
+            if(f.length()>1) {
+                float tem = stof(f);
+                postfix.push(tem);
+            }
+            else{
+                postfix.push(current-48);
+            }
+        }
+    }
+
+    if(pcounter[0]!=pcounter[1]) {
+        errorhandeling();
+        return postfixx;
+    }
+
+    while(!s.isEmpty()){
+        postfix.push(s.pop());
+    }
+
+
+    for(int i=postfix.size()-1;i>=0;i--){
+        postfixx.push(postfix.pop());
+    }
+    return postfixx;
+}
 int main() {
     std::cout << "Hello, World!" << std::endl;
     return 0;
