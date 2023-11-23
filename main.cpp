@@ -190,6 +190,48 @@ stack converttopostfix(vector<char> expresion){
     }
     return postfixx;
 }
+float calculate(stack postfix){
+    stack result;
+    int counter=0;
+    while(!postfix.isEmpty()){
+        float top=postfix.pop();
+        if(isopperator(top)){
+            float a=result.pop();
+            float b;
+            if(top!='!')
+                b=result.pop();
+
+            if(top=='^'){
+                result.push(pow(b,a));
+            }
+            else if(top=='+'){
+                result.push(b+a);
+            }
+            else if(top=='-'){
+                result.push(b-a);
+            }
+            else if(top=='/'){
+                result.push(b/a);
+            }
+            else if(top=='*'){
+                result.push(b*a);
+            }
+            else if(top=='!'){
+                result.push(factorial(a));
+            }
+            if(postfix.top()=='-') {
+                counter++;
+                postfix.pop();
+            }
+        }
+        else{
+            result.push(top);
+        }
+    }
+    if(counter%2==0)
+        return result.top();
+    return result.top()*(-1);
+}
 int main() {
     std::cout << "Hello, World!" << std::endl;
     return 0;
