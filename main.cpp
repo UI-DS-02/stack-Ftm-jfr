@@ -71,6 +71,7 @@ public:
         return false;
     }
 };
+
 bool rating(char current, char top) {
     map<char, int> precedence = {{'-', 1}, {'+', 1}, {'/', 2}, {'*', 2}, {'!', 3}, {'^',3}};
     int c1 = precedence[current];
@@ -80,8 +81,7 @@ bool rating(char current, char top) {
     return true;
 }
 
-
-bool isopperan(char c) {
+bool isopperator(char c) {
     set<char> a = {'+', '-', '*','^', '!', '/'};
     if (a.find(c) != a.end())
         return true;
@@ -142,7 +142,7 @@ stack converttopostfix(vector<char> expresion){
                 postfix.push((current)-48*(-1));
             }
         }
-        else if(isopperan(current))
+        else if(isopperator(current))
         {
             if(rating(current,s.top())){
                 s.push(current);
@@ -190,6 +190,7 @@ stack converttopostfix(vector<char> expresion){
     }
     return postfixx;
 }
+
 float calculate(stack postfix){
     stack result;
     int counter=0;
@@ -233,6 +234,16 @@ float calculate(stack postfix){
     return result.top()*(-1);
 }
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    string expression;
+    cout << "Enter a postfix expression: ";
+    getline(cin, expression);
+    vector<char> expre(expression.begin(), expression.end());
+    stack postfixStack = converttopostfix(expre);
+    if(postfixStack.isEmpty())
+    {
+        main();
+    }
+    float result = calculate(postfixStack);
+    cout << "Result: " << result << endl;
     return 0;
 }
