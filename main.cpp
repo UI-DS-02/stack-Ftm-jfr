@@ -32,8 +32,8 @@ public:
     virtual int size() = 0;
     virtual bool isEmpty() = 0;
 };
-void errorhandeling() {
-    cout<<"wrong input\n";
+void error_handling() {
+    cout<<"Wrong Input\n";
 }
 class stack : public Stack {
 public:
@@ -49,11 +49,8 @@ public:
             return Top->data;
     }
 
-
-
     float pop() override {
         Node* temp=Top;
-
         Top=Top->pre;
         float d=temp->data;
         delete temp;
@@ -76,12 +73,12 @@ bool rating(char current, char top) {
     map<char, int> precedence = {{'-', 1}, {'+', 1}, {'/', 2}, {'*', 2}, {'!', 3}, {'^',3}};
     int c1 = precedence[current];
     int c2 = precedence[top];
-    if (c1 < c2)
+    if (c1 <= c2)
         return false;
     return true;
 }
 
-bool isopperator(char c) {
+bool isoperator(char c) {
     set<char> a = {'+', '-', '*','^', '!', '/'};
     if (a.find(c) != a.end())
         return true;
@@ -96,110 +93,118 @@ int factorial(int num){
     return ans;
 }
 
-stack converttopostfix(vector<char> expresion){
-    stack s;
-    stack postfix;
-    stack postfixx;
-    int pcounter[2]={0,0};
+stack convert_to_postfix(string expresion){
+    stack operatorStack;
+    stack postfixStack;
+    stack reversedPostfixStack;
+    int parenthesesCounter[2]={0, 0};
     for(int i=0;i<expresion.size();i++){
         float current = expresion[i];
 
         if(current == '(')
         {
-            pcounter[0]++;
-            s.push('(') ;
+            parenthesesCounter[0]++;
+            operatorStack.push('(') ;
         }
         else if(current == ')')
         {
-            pcounter[1]++;
-            while (s.top()!='('&&!s.isEmpty()){
-                postfix.push(s.pop());
+            parenthesesCounter[1]++;
+            while (operatorStack.top() != '(' && !operatorStack.isEmpty()){
+                postfixStack.push(operatorStack.pop());
             }
-            if(s.isEmpty())
+            if(operatorStack.isEmpty())
             {
-                errorhandeling();
-                return postfixx;
+                error_handling();
+                return reversedPostfixStack;
             }
-            s.pop();
+            operatorStack.pop();
         }
-        else if(current=='-' && isdigit(expresion[i+1]))
+        else if(current=='-' && isdigit(expresion[i+1]) && !isdigit(expresion[i-1]))
         {
-            string f="-";
-            f=current;
+            string number="-";
+            number=current;
             i++;
             while(isdigit(expresion[i])||expresion[i]=='.')
             {
 
-                f+=expresion[i];
+                number+=expresion[i];
                 i++;
             }
             i--;
-            if(f.length()>1) {
-                float tem = stof(f);
-                postfix.push(tem);
+            if(number.length() > 1) {
+                float tem = stof(number);
+                postfixStack.push(tem);
             }
             else{
-                postfix.push((current)-48*(-1));
+                postfixStack.push((current) - 48 * (-1));
             }
         }
-        else if(isopperator(current))
+        else if(isoperator(current))
         {
-            if(rating(current,s.top())){
-                s.push(current);
-            } else{
-                while(!s.isEmpty() && !rating(current,s.top())){
-                    postfix.push(s.pop());
+            if(isoperator(expresion[i + 1]) || (i + 1 == expresion.size() && expresion[i] != '!')) {
+                error_handling();
+                return reversedPostfixStack;
+            }
+            if(rating(current, operatorStack.top())){
+                operatorStack.push(current);
+            }
+            else{
+                while(!operatorStack.isEmpty() && !rating(current, operatorStack.top())){
+                    postfixStack.push(operatorStack.pop());
                 }
-                s.push(current);
+                operatorStack.push(current);
             }
         }
         else
         {
-            string f;
-            f=current;
+            string number;
+            number=current;
             i++;
             while(isdigit(expresion[i])||expresion[i]=='.')
             {
 
-                f+=expresion[i];
+                number+=expresion[i];
                 i++;
             }
             i--;
-            if(f.length()>1) {
-                float tem = stof(f);
-                postfix.push(tem);
+            if(number.length() > 1) {
+                float tem = stof(number);
+                postfixStack.push(tem);
             }
             else{
-                postfix.push(current-48);
+                postfixStack.push(current - 48);
             }
         }
     }
 
-    if(pcounter[0]!=pcounter[1]) {
-        errorhandeling();
-        return postfixx;
+    if(parenthesesCounter[0] != parenthesesCounter[1]) {
+        error_handling();
+        return reversedPostfixStack;
     }
 
-    while(!s.isEmpty()){
-        postfix.push(s.pop());
+    while(!operatorStack.isEmpty()){
+        postfixStack.push(operatorStack.pop());
     }
 
-
-    for(int i=postfix.size()-1;i>=0;i--){
-        postfixx.push(postfix.pop());
+    for(int i= postfixStack.size() - 1; i >= 0; i--){
+        reversedPostfixStack.push(postfixStack.pop());
     }
-    return postfixx;
+    return reversedPostfixStack;
 }
 
+
+
 float calculate(stack postfix){
+    if(postfix.isEmpty())
+        return 0.0;
     stack result;
     int counter=0;
     while(!postfix.isEmpty()){
         float top=postfix.pop();
-        if(isopperator(top)){
+        if(isoperator(top)){
             float a=result.pop();
-            float b;
-            if(top!='!')
+            float b=0;
+            if(top!='!' && !result.isEmpty())
                 b=result.pop();
 
             if(top=='^'){
@@ -220,7 +225,7 @@ float calculate(stack postfix){
             else if(top=='!'){
                 result.push(factorial(a));
             }
-            if(postfix.top()=='-') {
+            else if(postfix.top()=='-') {
                 counter++;
                 postfix.pop();
             }
@@ -229,21 +234,26 @@ float calculate(stack postfix){
             result.push(top);
         }
     }
+
     if(counter%2==0)
         return result.top();
-    return result.top()*(-1);
+    else
+        return result.top()*(-1);
 }
+
 int main() {
     string expression;
-    cout << "Enter a postfix expression: ";
+    cout << "Enter a Intfix Expression: ";
     getline(cin, expression);
-    vector<char> expre(expression.begin(), expression.end());
-    stack postfixStack = converttopostfix(expre);
-    if(postfixStack.isEmpty())
+    stack postfixStack = convert_to_postfix(expression);
+    if(!postfixStack.isEmpty())
     {
-        main();
+        float result = calculate(postfixStack);
+        if(result==0.0)
+            error_handling();
+        else
+            cout << "Result: " << result << endl;
     }
-    float result = calculate(postfixStack);
-    cout << "Result: " << result << endl;
+    main();
     return 0;
 }
