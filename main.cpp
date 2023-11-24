@@ -32,9 +32,7 @@ public:
     virtual int size() = 0;
     virtual bool isEmpty() = 0;
 };
-void error_handling() {
-    cout<<"Wrong Input\n";
-}
+
 class stack : public Stack {
 public:
     void push(float data) override {
@@ -83,6 +81,10 @@ bool isoperator(char c) {
     if (a.find(c) != a.end())
         return true;
     return false;
+}
+
+void error_handling() {
+    cout<<"Wrong Input\n";
 }
 
 int factorial(int num){
@@ -155,6 +157,13 @@ stack convert_to_postfix(string expresion){
                 operatorStack.push(current);
             }
         }
+        else if(current == 'e' )
+            postfixStack.push( 2.71828);
+
+        else if(current == 'P' && expresion[i+1]=='I') {
+            postfixStack.push(3.14);
+            i++;
+        }
         else
         {
             string number;
@@ -191,8 +200,6 @@ stack convert_to_postfix(string expresion){
     }
     return reversedPostfixStack;
 }
-
-
 
 float calculate(stack postfix){
     if(postfix.isEmpty())
